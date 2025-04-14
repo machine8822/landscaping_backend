@@ -1,18 +1,28 @@
 const express = require("express");
 const cors = require("cors");
+const multer = require("multer");
+const Joi = require("joi");
 const app = express();
 app.use(express.static("public"));
 app.use(express.json());
 app.use(cors());
 
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "./public/images/");
+    },
+    filename: (req, file, cb) => {
+      cb(null, file.originalname);
+    },
+});
+  
+const upload = multer({ storage: storage });
+
 app.get("/",(req, res)=>{
     res.sendFile(__dirname+"/index.html");
 });
 
-
-
-app.get("/api/houses", (req, res)=>{
-    const houses = [
+let houses = [
     {
         "_id": "1",
         "name": "Mower",
@@ -58,9 +68,50 @@ app.get("/api/houses", (req, res)=>{
         "img1": "images/spreader.png",
         "img2": "https://machine8822.github.io/project/part6/images/placeholder.jpg"
     }
-    ];
+];
+
+app.get("/api/houses", (req, res)=>{
     res.send(houses);
 });
+
+app.post("/api/houses", upload.single("main_image"), (req,res)=>{
+    const result = validateHouse(req.body);
+
+
+    if(result.error){
+        console.log("I have an error");
+        res.status(400).send(result.error.details[0].message);
+        return;
+    }
+
+    const house = {
+        _id: houses.length,
+        name:req.body.name,
+        description:req.body.description,
+        price:req.body.price,
+        rating:req.body.rating,
+    };
+
+    if(req.file){
+        house.main_image = req.file.filename;
+    }
+
+    houses.push(house);
+    res.status(200).send(house);
+});
+
+const validateHouse = (house) => {
+    const schema = Joi.object({
+        _id:Joi.allow(""),
+        name:Joi.string().min(3).required(),
+        description:Joi.string().min(3).required(),
+        price:Joi.number().required().min(0),
+        rating:Joi.number().required().min(0),
+    });
+
+    return schema.validate(house);
+};
+
 
 app.get("/api/plants", (req, res) =>{
     const plants = [
