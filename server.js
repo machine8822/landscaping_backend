@@ -29,7 +29,7 @@ let houses = [
         "description": "Useful for cutting the grass when it gets too tall.",
         "price": "129.99",
         "rating": "4.2",
-        "img1": "images/mower.png",
+        "main_image": "mower.png",
         "img2": "https://machine8822.github.io/project/part6/images/placeholder.jpg"
     },
     {
@@ -38,7 +38,7 @@ let houses = [
         "description": "Useful for moving leaves into a pile.",
         "price": "9.99",
         "rating": "3.4",
-        "img1": "images/rake.png",
+        "main_image": "rake.png",
         "img2": "https://machine8822.github.io/project/part6/images/placeholder.jpg"
     },
     {
@@ -47,7 +47,7 @@ let houses = [
         "description": "Useful for trimming up the edge of the grass.",
         "price": "99.99",
         "rating": "4.4",
-        "img1": "images/edger.png",
+        "main_image": "edger.png",
         "img2": "https://machine8822.github.io/project/part6/images/placeholder.jpg"
     },
     {
@@ -56,7 +56,7 @@ let houses = [
         "description": "Useful for blowing leaves wherever you need to.",
         "price": "38.99",
         "rating": "3.3",
-        "img1": "images/leafblower.png",
+        "main_image": "leafblower.png",
         "img2": "https://machine8822.github.io/project/part6/images/placeholder.jpg"
     },
     {
@@ -65,7 +65,7 @@ let houses = [
         "description": "Useful for spreading pesticide and other chemicals over a wide area.",
         "price": "49.99",
         "rating": "2.7",
-        "img1": "images/spreader.png",
+        "main_image": "spreader.png",
         "img2": "https://machine8822.github.io/project/part6/images/placeholder.jpg"
     }
 ];
@@ -74,7 +74,7 @@ app.get("/api/houses", (req, res)=>{
     res.send(houses);
 });
 
-app.post("/api/houses", upload.single("main_image"), (req,res)=>{
+app.post("/api/houses", upload.single("img"), (req,res)=>{
     const result = validateHouse(req.body);
 
 
@@ -161,7 +161,7 @@ app.get("/api/plants", (req, res) =>{
             "description": "Useful for keep the soil a good temperature and to prevent weeds from growing.",
             "price": "3.99",
             "rating": "4.2",
-            "img1": "images/mulch.png",
+            "main_image": "mulch.png",
             "img2": "https://machine8822.github.io/project/part6/images/placeholder.jpg"
           },
           {
@@ -170,7 +170,7 @@ app.get("/api/plants", (req, res) =>{
             "description": "Useful for fertilizing grass.",
             "price": "4.99",
             "rating": "3.4",
-            "img1": "images/straw.png",
+            "main_image": "straw.png",
             "img2": "https://machine8822.github.io/project/part6/images/placeholder.jpg"
           },
           {
@@ -179,7 +179,7 @@ app.get("/api/plants", (req, res) =>{
             "description": "Tall, bushy tree. Commonly used as Christmas trees.",
             "price": "32.99",
             "rating": "4.4",
-            "img1": "images/tree.png",
+            "main_image": "tree.png",
             "img2": "https://machine8822.github.io/project/part6/images/placeholder.jpg"
           },
           {
@@ -188,7 +188,7 @@ app.get("/api/plants", (req, res) =>{
             "description": "Roses are our speciality, especially around this time.",
             "price": "6.99",
             "rating": "3.3",
-            "img1": "images/flower.jpg",
+            "main_image": "flower.jpg",
             "img2": "https://machine8822.github.io/project/part6/images/placeholder.jpg"
           }
         
