@@ -124,7 +124,7 @@ app.put("/api/houses/:id", upload.single("img"), (req, res)=>{
         house.main_image = req.file.filename;
     }
 
-    req.status(200).send(house);
+    res.status(200).send(house);
 });
 
 app.delete("/api/houses/:id", (req, res)=>{
