@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
 const Joi = require("joi");
+const mongoose = require("mongoose");
 const app = express();
 app.use(express.static("public"));
 app.use(express.json());
@@ -18,10 +19,29 @@ const storage = multer.diskStorage({
   
 const upload = multer({ storage: storage });
 
+mongoose
+.connect("mongodb+srv://machine:Turbo@project.ob11xvh.mongodb.net/")
+.then(() => {
+  console.log("connected to mongodb");
+})
+.catch((error) => {
+  console.log("couldn't connect to mongodb", error);
+});
+
+const houseSchema = new mongoose.Schema({
+    name:String,
+    description:String,
+    price:Number,
+    rating:Number,
+    main_image:String
+});
+
+const House = mongoose.model("House", houseSchema);
+
 app.get("/",(req, res)=>{
     res.sendFile(__dirname+"/index.html");
 });
-
+/*
 let houses = [
     {
         "_id": "1",
@@ -69,14 +89,15 @@ let houses = [
         "img2": "https://machine8822.github.io/project/part6/images/placeholder.jpg"
     }
 ];
-
-app.get("/api/houses", (req, res)=>{
+*/
+app.get("/api/houses", async(req, res)=>{
+    const houses = await House.find();
+    console.log(houses);
     res.send(houses);
 });
 
-app.post("/api/houses", upload.single("img"), (req,res)=>{
+app.post("/api/houses", upload.single("img"), async(req,res)=>{
     const result = validateHouse(req.body);
-
 
     if(result.error){
         console.log("I have an error");
@@ -84,29 +105,22 @@ app.post("/api/houses", upload.single("img"), (req,res)=>{
         return;
     }
 
-    const house = {
-        _id: houses.length,
+    const house = new House({
         name:req.body.name,
         description:req.body.description,
         price:req.body.price,
         rating:req.body.rating,
-    };
+    });
 
     if(req.file){
         house.main_image = req.file.filename;
     }
 
-    houses.push(house);
-    res.status(200).send(house);
+    const newHouse = await house.save();
+    res.status(200).send(newHouse);
 });
 
-app.put("/api/houses/:id", upload.single("img"), (req, res)=>{
-    const house = houses.find((house)=>house._id===parseInt(req.params.id));
-
-    if(!house) {
-        res.status(404).send("The house with the provided id was not found");
-        return;
-    }
+app.put("/api/houses/:id", upload.single("img"), async(req, res)=>{
 
     const result = validateHouse(req.body);
 
@@ -115,31 +129,25 @@ app.put("/api/houses/:id", upload.single("img"), (req, res)=>{
         return;
     }
 
-    house.name = req.body.name;
-    house.description = req.body.description;
-    house.price = req.body.price;
-    house.rating = req.body.rating;
+    const fieldsToUpdate = {
+        name:req.body.name,
+        description:req.body.description,
+        price:req.body.price,
+        rating:req.body.rating
+    }
 
     if(req.file) {
-        house.main_image = req.file.filename;
+        fieldsToUpdate.main_image = req.file.filename;
     }
+
+    const success = await House.updateOne({_id:req.params.id}, fieldsToUpdate);
+    const house = await House.findOne({_id:req.params.id});
 
     res.status(200).send(house);
 });
 
-app.delete("/api/houses/:id", (req, res)=>{
-    console.log("I'm trying to delete" + req.params.id);
-    const house = houses.find((house)=>house._id===parseInt(req.params.id));
-
-    if(!house) {
-        console.log("Not found");
-        res.status(404).send("The house with the provided id was not found");
-        return;
-    }
-    console.log("Found it");
-    console.log("The house you are deleting is " + house.name);
-    const index = houses.indexOf(house);
-    houses.splice(index,1);
+app.delete("/api/houses/:id", async(req, res)=>{
+    const house = await House.findByIdAndDelete(req.params.id);
     res.status(200).send(house);
 });
 
